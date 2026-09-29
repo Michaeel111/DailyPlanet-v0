@@ -287,10 +287,10 @@ console.log('Token:', token)
             <Settings2 />
           </button>
 
-          {user?.isPremium ? (
-  <a href="/premium" className="premium-button">
-    ✓ Premium
-  </a>
+   {user?.isPremium ? (
+  <span className="premium-button">
+    Already Premium
+  </span>
 ) : (
   <a href="/premium" className="premium-button">
     Premium
