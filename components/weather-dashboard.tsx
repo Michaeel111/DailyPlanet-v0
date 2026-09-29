@@ -287,9 +287,9 @@ console.log('Token:', token)
             <Settings2 />
           </button>
 
-   {user?.isPremium ? (
+{user?.isPremium ? (
   <span className="premium-button">
-    Already Premium
+    ✓ Premium
   </span>
 ) : (
   <a href="/premium" className="premium-button">
