@@ -74,6 +74,13 @@ export function WeatherDashboard() {
   const [weather, setWeather] = useState<any>(null)
   const [forecast, setForecast] = useState<any>(null)
   const [user, setUser] = useState<any>(null)
+  useEffect(() => {
+  const storedUser = localStorage.getItem('user')
+
+  if (storedUser) {
+    setUser(JSON.parse(storedUser))
+  }
+}, [])
   const handleSavePlace = async () => {
   const token = localStorage.getItem('token')
 
@@ -280,15 +287,22 @@ console.log('Token:', token)
             <Settings2 />
           </button>
 
-          <a href="/premium" className="premium-button">
-            Premium
-          </a>
+          {user?.isPremium ? (
+  <a href="/premium" className="premium-button">
+    ✓ Premium
+  </a>
+) : (
+  <a href="/premium" className="premium-button">
+    Premium
+  </a>
+)}
 
          <button
   className="avatar"
   aria-label="Logout"
   onClick={() => {
     localStorage.removeItem('token')
+    localStorage.removeItem('user')
     window.location.href = '/login'
   }}
 >
