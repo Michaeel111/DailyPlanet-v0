@@ -1,55 +1,101 @@
 'use client'
 
+import { CloudSun, Check, Crown, ArrowLeft } from 'lucide-react'
+
 export default function PremiumPage() {
   return (
-    <main>
-      <h1>Daily Planet Premium</h1>
+    <main className="auth-page premium-page">
+      <div className="premium-card">
+        <a href="/" className="auth-brand">
+          <span className="auth-brand-icon">
+            <CloudSun size={24} />
+          </span>
+          <span>Daily Planet</span>
+        </a>
 
-      <p>Upgrade to Premium for ₦5,000.</p>
+        <div className="premium-icon">
+          <Crown size={30} />
+        </div>
 
-      <ul>
-        <li>Extended weather forecasts</li>
-        <li>Premium weather features</li>
-        <li>More detailed weather information</li>
-      </ul>
+        <div className="auth-heading premium-heading">
+          <p className="eyebrow">Daily Planet Premium</p>
+          <h1>Go beyond the forecast.</h1>
+          <p>
+            Unlock more detailed weather information and extended forecasts
+            with Daily Planet Premium.
+          </p>
+        </div>
 
-      <button
-  onClick={async () => {
-    try {
-      const token = localStorage.getItem('token')
+        <div className="premium-price">
+          <span>₦5,000</span>
+          <small>one-time upgrade</small>
+        </div>
 
-      const response = await fetch(
-        'https://dailyplanet-production.up.railway.app/api/payment/initialize',
-        {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      )
+        <div className="premium-features">
+          <div>
+            <span className="premium-check">
+              <Check size={17} />
+            </span>
+            <span>Extended weather forecasts</span>
+          </div>
 
-      const result = await response.json()
+          <div>
+            <span className="premium-check">
+              <Check size={17} />
+            </span>
+            <span>Premium weather features</span>
+          </div>
 
-      if (response.ok && result.authorization_url) {
-        window.location.href = result.authorization_url
-      } else {
-        alert(result.error || 'Could not start payment')
-      }
-    } catch (error) {
-      alert('Could not connect to the payment server')
-    }
-  }}
->
-  Upgrade to Premium
-</button>
+          <div>
+            <span className="premium-check">
+              <Check size={17} />
+            </span>
+            <span>More detailed weather information</span>
+          </div>
+        </div>
 
-      <p>
-        Already Premium? Your account will automatically have access to
-        Premium features after successful payment.
-      </p>
+        <button
+          className="premium-submit"
+          onClick={async () => {
+            try {
+              const token = localStorage.getItem('token')
 
-      <a href="/">Back to Weather</a>
+              const response = await fetch(
+                'https://dailyplanet-production.up.railway.app/api/payment/initialize',
+                {
+                  method: 'POST',
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                  },
+                }
+              )
+
+              const result = await response.json()
+
+              if (response.ok && result.authorization_url) {
+                window.location.href = result.authorization_url
+              } else {
+                alert(result.error || 'Could not start payment')
+              }
+            } catch (error) {
+              alert('Could not connect to the payment server')
+            }
+          }}
+        >
+          Upgrade to Premium
+        </button>
+
+        <p className="premium-note">
+          Already Premium? Your account will automatically have access to
+          Premium features after successful payment.
+        </p>
+
+        <a href="/" className="premium-back">
+          <ArrowLeft size={16} />
+          Back to Weather
+        </a>
+      </div>
     </main>
   )
 }

@@ -11,44 +11,36 @@ export default function PremiumSuccessPage() {
     const verifyPayment = async () => {
       const params = new URLSearchParams(window.location.search)
       const reference = params.get('reference')
-      const token = localStorage.getItem('token')
 
       if (!reference) {
-        setMessage('No payment reference found.')
-        return
-      }
-
-      if (!token) {
-        setMessage('You are not logged in.')
+        setMessage('Payment reference not found.')
         return
       }
 
       try {
         const response = await fetch(
-          `${API_URL}/api/payment/verify/${reference}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+          `${API_URL}/api/payment/verify/${reference}`
         )
 
         const result = await response.json()
 
-        if (result.success) {
-          setMessage('Payment successful! Redirecting...')
+        if (response.ok && result.success) {
+          setMessage('Payment successful! Redirecting to Daily Planet...')
 
           setTimeout(() => {
             window.location.href = '/'
-          }, 2000)
-        } else {
-          setMessage(
-            result.message || 'Payment could not be verified.'
-          )
+          }, 1500)
+
+          return
         }
+
+        setMessage(
+          result.error ||
+            result.message ||
+            'Payment verification failed.'
+        )
       } catch (error) {
-        console.error(error)
-        setMessage('Something went wrong verifying payment.')
+        setMessage('Could not verify your payment.')
       }
     }
 

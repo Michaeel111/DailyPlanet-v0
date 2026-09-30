@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { CloudSun } from 'lucide-react'
 
 const API_URL = 'https://dailyplanet-production.up.railway.app'
 
@@ -43,55 +44,69 @@ export default function LoginPage() {
   }
 
   return (
-    <main style={{ maxWidth: '400px', margin: '80px auto', padding: '20px' }}>
-      <h1>Daily Planet Login</h1>
+    <main className="auth-page">
+      <div className="auth-card">
+        <a href="/" className="auth-brand">
+          <span className="auth-brand-icon">
+            <CloudSun size={24} />
+          </span>
+          <span>Daily Planet</span>
+        </a>
 
-      <form onSubmit={handleLogin}>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          style={{ width: '100%', padding: '12px', margin: '10px 0' }}
-        />
+        <div className="auth-heading">
+          <p className="eyebrow">Welcome back</p>
+          <h1>Sign in to Daily Planet</h1>
+          <p>
+            Check the weather, manage your saved places, and get the most from
+            your Daily Planet account.
+          </p>
+        </div>
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          style={{ width: '100%', padding: '12px', margin: '10px 0' }}
-        />
-        <a
-  href="/forgot-password"
-  style={{
-    display: 'block',
-    marginTop: '10px',
-    textAlign: 'right',
-  }}
->
-  Forgot password?
-</a>
-<p>
-  Don't have an account?{' '}
-  <a href="/signup">Sign Up</a>
-</p>
-        <button
-          type="submit"
-          disabled={loading}
-          style={{ width: '100%', padding: '12px', marginTop: '10px' }}
-        >
-          {loading ? 'Logging in...' : 'Login'}
-        </button>
-      </form>
+        <form onSubmit={handleLogin} className="auth-form">
+          <label htmlFor="email">Email</label>
+          <input
+            id="email"
+            type="email"
+            placeholder="you@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
 
-      {message && (
-        <p style={{ marginTop: '15px' }}>
-          {message}
+          <div className="auth-password-row">
+            <label htmlFor="password">Password</label>
+            <a href="/forgot-password">Forgot password?</a>
+          </div>
+
+          <input
+            id="password"
+            type="password"
+            placeholder="Enter your password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+
+          {message && (
+            <p className="auth-message">
+              {message}
+            </p>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="auth-submit"
+          >
+            {loading ? 'Logging in...' : 'Login'}
+          </button>
+        </form>
+
+        <p className="auth-footer">
+          Don't have an account?{' '}
+          <a href="/signup">Create an account</a>
         </p>
-      )}
+      </div>
     </main>
   )
 }

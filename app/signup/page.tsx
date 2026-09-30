@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { CloudSun } from 'lucide-react'
 
 const API_URL = 'https://dailyplanet-production.up.railway.app'
 
@@ -47,37 +48,71 @@ export default function SignupPage() {
   }
 
   return (
-    <main>
-      <h1>Create Account</h1>
+    <main className="auth-page">
+      <div className="auth-card">
+        <a href="/" className="auth-brand">
+          <span className="auth-brand-icon">
+            <CloudSun size={24} />
+          </span>
+          <span>Daily Planet</span>
+        </a>
 
-      <p>Sign up for Daily Planet</p>
+        <div className="auth-heading">
+          <p className="eyebrow">Join Daily Planet</p>
+          <h1>Create your account</h1>
+          <p>
+            Create an account to save your favorite places and access more
+            Daily Planet features.
+          </p>
+        </div>
 
-      <form onSubmit={handleSubmit}>
-        <input
-          type="email"
-          placeholder="Enter your email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
+        <form onSubmit={handleSubmit} className="auth-form">
+          <label htmlFor="signup-email">Email</label>
+          <input
+            id="signup-email"
+            type="email"
+            placeholder="you@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
 
-        <input
-          type="password"
-          placeholder="Create a password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
+          <label htmlFor="signup-password">Password</label>
+          <input
+            id="signup-password"
+            type="password"
+            placeholder="Create a password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
 
-        <button type="submit" disabled={loading}>
-          {loading ? 'Creating Account...' : 'Sign Up'}
-        </button>
-      </form>
+          {message && (
+            <p className="auth-success">
+              {message}
+            </p>
+          )}
 
-      {message && <p>{message}</p>}
-      {error && <p>{error}</p>}
+          {error && (
+            <p className="auth-message">
+              {error}
+            </p>
+          )}
 
-      <a href="/login">Already have an account? Log in</a>
+          <button
+            type="submit"
+            disabled={loading}
+            className="auth-submit"
+          >
+            {loading ? 'Creating Account...' : 'Sign Up'}
+          </button>
+        </form>
+
+        <p className="auth-footer">
+          Already have an account?{' '}
+          <a href="/login">Log in</a>
+        </p>
+      </div>
     </main>
   )
 }

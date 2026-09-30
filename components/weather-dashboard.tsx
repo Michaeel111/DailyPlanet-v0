@@ -70,6 +70,7 @@ export function WeatherDashboard() {
   const [activePlace, setActivePlace] = useState('Lagos')
   const [searchOpen, setSearchOpen] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [savedPlaces, setSavedPlaces] = useState<any[]>([])
   const [unit, setUnit] = useState('°C')
   const [weather, setWeather] = useState<any>(null)
   const [forecast, setForecast] = useState<any>(null)
@@ -81,7 +82,17 @@ export function WeatherDashboard() {
     setUser(JSON.parse(storedUser))
   }
 }, [])
+useEffect(() => {
+  const isSaved = savedPlaces.some(
+    (place: any) =>
+      place.city_name.toLowerCase() === activePlace.toLowerCase()
+  )
+
+  setSaved(isSaved)
+}, [savedPlaces, activePlace])
   const handleSavePlace = async () => {
+    console.log('Country code:', weather?.sys?.country)
+    console.log('Weather before saving:', weather)
   const token = localStorage.getItem('token')
 
   const convertTemp = (celsius: number) => {
@@ -96,9 +107,17 @@ export function WeatherDashboard() {
     window.location.href = '/login'
     return
   }
+  if (!weather?.sys?.country) {
+  alert('Weather information is still loading. Please try again in a moment.')
+  return
+}
 console.log('API URL:', API_URL)
 console.log('Token:', token)
   try {
+    console.log('Sending favorite:', {
+  cityName: activePlace,
+  countryCode: 'TEST',
+})
     const response = await fetch(`${API_URL}/api/favorites`, {
       method: 'POST',
       headers: {
@@ -107,6 +126,8 @@ console.log('Token:', token)
       },
       body: JSON.stringify({
         cityName: activePlace,
+        countryCode:
+         weather?.sys?.country,
       }),
     })
 
@@ -125,43 +146,8 @@ console.log('Token:', token)
 
   const API_URL = 'https://dailyplanet-production.up.railway.app'
 
-  useEffect(() => {
-    const handleSavePlace = async () => {
-  const token = localStorage.getItem('token')
+  useEffect(() => { 
 
-  if (!token) {
-    window.location.href = '/login'
-    return
-  }
-
-  try {
-    if (!saved) {
-      const response = await fetch(`${API_URL}/api/favorites`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          cityName: activePlace,
-        }),
-      })
-
-      const result = await response.json()
-
-      if (response.ok) {
-        setSaved(true)
-      } else {
-        alert(result.error || 'Could not save place')
-      }
-    } else {
-      alert('This place is already saved.')
-    }
-  } catch (error) {
-    console.error('Save favorite failed:', error)
-    alert('Could not connect to the server')
-  }
-}
     const fetchWeather = async () => {
       try {
         const response = await fetch(
@@ -211,6 +197,33 @@ console.log('Token:', token)
         setForecast(null)
       }
     }
+    const fetchSavedPlaces = async () => {
+  try {
+    const token = localStorage.getItem('token')
+
+    if (!token) {
+      setSavedPlaces([])
+      return
+    }
+
+    const response = await fetch(`${API_URL}/api/favorites`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+
+    const result = await response.json()
+
+    if (response.ok) {
+      setSavedPlaces(result)
+    } else {
+      console.error(result.error)
+    }
+  } catch (error) {
+    console.error('Saved places fetch failed:', error)
+  }
+}
+
     const fetchUser = async () => {
   try {
     const token = localStorage.getItem('token')
@@ -242,7 +255,37 @@ console.log('Token:', token)
 
     fetchWeather()
     fetchForecast()
+    fetchSavedPlaces()
   }, [activePlace])
+  const handleDeletePlace = async (id: number) => {
+  const token = localStorage.getItem('token')
+
+  if (!token) {
+    return
+  }
+
+  try {
+    const response = await fetch(`${API_URL}/api/favorites/${id}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+
+    const result = await response.json()
+
+    if (response.ok) {
+      setSavedPlaces(
+        savedPlaces.filter((place: any) => place.id !== id)
+      )
+    } else {
+      alert(result.error || 'Could not remove place')
+    }
+  } catch (error) {
+    console.error('Delete favorite failed:', error)
+    alert('Could not connect to the server')
+  }
+}
 
   return (
     <main className="app-shell">
@@ -428,13 +471,25 @@ console.log('Token:', token)
         </div>
 
         <section className="hero-card" id="overview">
-          <div className="hero-copy">
-            <p className="eyebrow light">
-              Thursday, June 12, 2025{' '}
-              <span className="live-dot">Live</span>
-            </p>
+  <div className="hero-copy">
+    <p className="eyebrow light">
+      {new Date().toLocaleDateString('en-US', {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+      })}{' '}
+      <span className="live-dot">Live</span>
+    </p>
 
-            <h1>Good morning, {activePlace}.</h1>
+            <h1>
+  {new Date().getHours() < 12
+    ? 'Good morning'
+    : new Date().getHours() < 18
+      ? 'Good afternoon'
+      : 'Good evening'}
+  , {activePlace}.
+</h1>
 
             <p className="conditions">
               {weather
@@ -698,6 +753,46 @@ console.log('Token:', token)
               )}
             </div>
           </section>
+          <section
+  className="section-block"
+  id="saved"
+>
+  <div className="section-heading">
+    <div>
+      <p className="eyebrow">Your locations</p>
+      <h2>Saved places</h2>
+    </div>
+  </div>
+
+  {savedPlaces.length > 0 ? (
+    <div className="saved-places-list">
+      {savedPlaces.map((place: any) => (
+        <div className="saved-place" key={place.id}>
+          <div>
+            <strong>{place.city_name}</strong>
+            <span>{place.country_code}</span>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setActivePlace(place.city_name)}
+          >
+            View weather
+            </button>
+
+            <button
+  type="button"
+  onClick={() => handleDeletePlace(place.id)}
+>
+  Remove
+</button>
+        </div>
+      ))}
+    </div>
+  ) : (
+    <p>No saved places yet.</p>
+  )}
+</section>
 
           <aside className="side-stack">
             <section className="insight-card">
