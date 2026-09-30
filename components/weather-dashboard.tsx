@@ -252,10 +252,6 @@ console.log('Token:', token)
   }
 }
 
-useEffect(() => {
-  fetchUser()
-}, [])
-
     fetchWeather()
     fetchForecast()
     fetchSavedPlaces()
